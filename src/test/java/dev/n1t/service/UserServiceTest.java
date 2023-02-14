@@ -1,9 +1,8 @@
 package dev.n1t.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import dev.n1t.model.User;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,7 @@ public class UserServiceTest {
 
     @Test
     public void contextLoads() {
-        assertThat(userService).isNotNull();
+        assertNotNull(userService);
     }
 
     @Test
@@ -58,6 +57,6 @@ public class UserServiceTest {
         User createdUser = userService.createUser(new User());
         assertNotNull(userService.readUserById(createdUser.getId()));
         userService.deleteUser(createdUser.getId());
-        assertThrows(RuntimeException.class, () -> {userService.readUserById(createdUser.getId());});
+        assertNull(userService.readUserById(createdUser.getId()));
     }
 }

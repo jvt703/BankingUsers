@@ -21,8 +21,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public User readUserById(int id) {
-        return userRepository.findById(id).orElseThrow(() ->
-                new RuntimeException("Unable to find user with ID: " + id));
+        return userRepository.findById(id).orElse(null);
     }
 
     @Transactional(readOnly = true)
@@ -42,7 +41,6 @@ public class UserService {
 
     @Transactional
     public void deleteUser(int id) {
-        User user = readUserById(id);
-        userRepository.delete(user);
+        userRepository.deleteById(id);
     }
 }
