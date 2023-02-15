@@ -1,4 +1,4 @@
 package dev.n1t.dto;
 
-public record UserDTO(String firstname, String lastname, String email, String password) {
+public record UserDTO(int id, String firstname, String lastname, String email, String password) {
 }
