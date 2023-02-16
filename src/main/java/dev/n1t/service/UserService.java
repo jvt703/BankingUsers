@@ -4,7 +4,6 @@ import dev.n1t.dto.UserDTO;
 import dev.n1t.model.User;
 import dev.n1t.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +14,7 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     public UserService(UserRepository userRepository) {
@@ -44,12 +43,9 @@ public class UserService {
     }
 
     @Transactional
-    public boolean deleteUser(int id) {
-        try {
-            userRepository.deleteById(id);
-        } catch (EmptyResultDataAccessException e) {
-            return false;
-        }
+    public boolean deleteUserById(int id) {
+        if (readUserById(id) == null) {return false;}
+        userRepository.deleteById(id);
         return true;
     }
 
