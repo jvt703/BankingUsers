@@ -3,6 +3,7 @@ package dev.n1t.service;
 import dev.n1t.dto.UserDTO;
 import dev.n1t.model.User;
 import dev.n1t.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -28,7 +29,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public User readUserById(int id) {
-        return userRepository.findById(id).orElse(null);
+        return userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     @Transactional(readOnly = true)
@@ -38,15 +39,18 @@ public class UserService {
 
     @Transactional
     public User updateUser(User user) {
-        if (readUserById(user.getId()) == null) {return null;}
-        return userRepository.save(user);
+        if (checkUserExistById(user.getId())) {
+            return userRepository.save(user);
+        }
+        throw new EntityNotFoundException();
     }
 
     @Transactional
-    public boolean deleteUserById(int id) {
-        if (readUserById(id) == null) {return false;}
-        userRepository.deleteById(id);
-        return true;
+    public void deleteUserById(int id) {
+        if (checkUserExistById(id)) {
+            userRepository.deleteById(id);
+        }
+        throw new EntityNotFoundException();
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -106,5 +110,9 @@ public class UserService {
                 0,
                 0
                 );
+    }
+
+    private boolean checkUserExistById(int id) {
+        return userRepository.findById(id).isPresent();
     }
 }
