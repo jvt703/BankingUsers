@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -70,8 +72,52 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserDTO> readAllUsersDTO() {
-        return userDTOMapper(readAllUsers());
+    public List<UserDTO> readAllUsersDTO(Map<String, String> query) {
+        List<UserDTO> userDTOS = userDTOMapper(readAllUsers());
+        if (userDTOS.isEmpty()) {return userDTOS;}
+
+        List<UserDTO> returnList = userDTOS;
+
+        if (query.containsKey("id")) {
+            try {
+                int id = Integer.parseInt(query.get("id"));
+                List<UserDTO> tempList = returnList;
+                tempList = returnList.stream()
+                        .filter(user -> (user.id() == id))
+                        .collect(Collectors.toList());
+                returnList = tempList;
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+
+        if (query.containsKey("fn")) {
+            String fn = query.get("fn");
+            List<UserDTO> tempList = returnList;
+            tempList = returnList.stream()
+                    .filter(user -> (user.firstname().equalsIgnoreCase(fn)))
+                    .collect(Collectors.toList());
+            returnList = tempList;
+        }
+
+        if (query.containsKey("ln")) {
+            String ln = query.get("ln");
+            List<UserDTO> tempList = returnList;
+            tempList = returnList.stream()
+                    .filter(user -> (user.lastname().equalsIgnoreCase(ln)))
+                    .collect(Collectors.toList());
+            returnList = tempList;
+        }
+
+        if (query.containsKey("email")) {
+            String email = query.get("email");
+            List<UserDTO> tempList = returnList;
+            tempList = returnList.stream()
+                    .filter(user -> (user.email().equalsIgnoreCase(email)))
+                    .collect(Collectors.toList());
+            returnList = tempList;
+        }
+        return returnList;
     }
 
     @Transactional

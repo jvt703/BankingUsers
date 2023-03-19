@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -41,8 +43,8 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> readAllUsers() {
-        return ResponseEntity.ok(userService.readAllUsersDTO());
+    public ResponseEntity<List<UserDTO>> readAllUsers(@RequestParam Map<String, String> query) {
+        return ResponseEntity.ok(userService.readAllUsersDTO(query));
     }
 
     @PutMapping
