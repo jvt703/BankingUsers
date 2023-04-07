@@ -1,6 +1,8 @@
 package dev.n1t.controller;
 
 import dev.n1t.dto.UserDTO;
+import dev.n1t.model.Address;
+import dev.n1t.model.Role;
 import dev.n1t.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +39,15 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> readUserById(@PathVariable("id") int id) {
+//        UserDTO userDTO = new UserDTO(1,
+//                "Mario",
+//                "Mario",
+//                "mario.mario@email.com",
+//                "password",
+//                0L,
+//                new Address(1L, "city", "state", "street", "zipCode"),
+//                new Role(1L, "roleName"));
+//        return ResponseEntity.ok(userDTO);
         UserDTO userDTO = userService.readUserByIdDTO(id);
         if (userDTO == null) {return new ResponseEntity<>(HttpStatus.NOT_FOUND);}
         return ResponseEntity.ok(userDTO);
