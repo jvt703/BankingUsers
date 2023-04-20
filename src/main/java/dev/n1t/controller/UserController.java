@@ -4,6 +4,7 @@ import dev.n1t.dto.UserDTO;
 import dev.n1t.model.Address;
 import dev.n1t.model.Role;
 import dev.n1t.service.UserService;
+import dev.n1t.util.EmailServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,13 +28,21 @@ import java.util.Map;
 public class UserController {
     private final UserService userService;
 
+    private final EmailServiceImpl emailService;
+
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, EmailServiceImpl emailService) {
         this.userService = userService;
+        this.emailService = emailService;
     }
 
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
+        emailService.sendSimpleMessage(
+                userDTO.email(),
+                "Welcome to Nine Ten - Verify",
+                "Welcome to Nine Ten " + userDTO.firstname() +
+                        "! Please use this code to verify your email: 392887");
         return ResponseEntity.ok(userService.createUserDTO(userDTO));
     }
 

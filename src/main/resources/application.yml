@@ -1,31 +1,42 @@
 spring:
-  datasource:
-#    driver-class-name: org.h2.Driver
-#    username: sa
-#    url: jdbc:h2:mem:db;
-#    password: sa
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-  h2:
-    console:
-      enabled: 'true'
-      path: /h2
-  application:
-    name: user-microservice
   config:
     import: optional:file:.env[.properties]
+  mail:
+    host: smtp.gmail.com
+    username: ${SMTP_USERNAME}
+    port: '587'
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: 'true'
+          auth: 'true'
+    password: ${SMTP_PASSWORD}
+  application:
+    name: user-microservice
   jpa:
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL5Dialect
+    #        dialect: org.hibernate.dialect.MySQL5Dialect
     hibernate:
       hbm2ddl:
         auto: update
-      show-sql: 'true'
       ddl-auto: update
+      show-sql: 'true'
     show-sql: 'true'
+  h2:
+    console:
+      path: /h2
+      enabled: 'true'
+  datasource:
+    password: sa
+    driver-class-name: org.h2.Driver
+    username: sa
+    url: jdbc:h2:mem:db;
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: ${DB_URL}
+#    username: ${DB_USERNAME}
+#    password: ${DB_PASSWORD}
 eureka:
   client:
     serviceURL:
