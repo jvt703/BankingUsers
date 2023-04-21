@@ -2,6 +2,8 @@ package dev.n1t.service;
 
 import dev.n1t.dto.UserDTO;
 import dev.n1t.model.User;
+import dev.n1t.repository.AddressRepository;
+import dev.n1t.repository.RoleRepository;
 import dev.n1t.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,19 +20,26 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final AddressRepository addressRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, AddressRepository addressRepository) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.addressRepository = addressRepository;
     }
+
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public User createUser(User user) {
+        addressRepository.save(user.getAddress());
+        roleRepository.save(user.getRole());
         return userRepository.save(user);
     }
 
     @Transactional(readOnly = true)
-    public User readUserById(int id) {
+    public User readUserById(long id) {
         return userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
@@ -42,13 +51,15 @@ public class UserService {
     @Transactional
     public User updateUser(User user) {
         if (checkUserExistById(user.getId())) {
+            addressRepository.save(user.getAddress());
+            roleRepository.save(user.getRole());
             return userRepository.save(user);
         }
         throw new EntityNotFoundException();
     }
 
     @Transactional
-    public void deleteUserById(int id) {
+    public void deleteUserById(long id) {
         if (checkUserExistById(id)) {
             userRepository.deleteById(id);
         }
@@ -137,7 +148,10 @@ public class UserService {
                     user.getFirstname(),
                     user.getLastname(),
                     user.getEmail(),
-                    user.getPassword()
+                    user.getPassword(),
+                    user.getBirthDate(),
+                    user.getAddress(),
+                    user.getRole()
             );
             userDTOList.add(userDTO);
         }
@@ -153,12 +167,13 @@ public class UserService {
                 false,
                 userDTO.password(),
                 false,
-                0,
-                0
+                userDTO.birthDate(),
+                userDTO.address(),
+                userDTO.role()
                 );
     }
 
-    private boolean checkUserExistById(int id) {
-        return userRepository.findById(id).isPresent();
+    private boolean checkUserExistById(long id) {
+        return userRepository.findById((id)).isPresent();
     }
 }
