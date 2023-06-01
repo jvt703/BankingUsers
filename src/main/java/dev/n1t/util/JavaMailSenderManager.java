@@ -1,11 +1,12 @@
 package dev.n1t.util;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
-
+@Configuration
 public class JavaMailSenderManager {
     @Bean
     public JavaMailSender getJavaMailSender() {
@@ -13,7 +14,7 @@ public class JavaMailSenderManager {
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
 
-        mailSender.setUsername("");
+        mailSender.setUsername("ninetenbankmail@gmail.com");
         mailSender.setPassword("");
 
         Properties props = mailSender.getJavaMailProperties();

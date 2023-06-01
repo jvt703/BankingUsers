@@ -36,6 +36,8 @@ public class User {
     @Column(nullable = false)
     private String email;
 
+
+
     @NotNull
     @Column(nullable = false, name = "emailValidated")
     private boolean emailValidated;
@@ -43,6 +45,7 @@ public class User {
     @NotNull
     @Column(nullable = false)
     private String password;
+
 
     @NotNull
     @Column(nullable = false)
@@ -59,4 +62,23 @@ public class User {
     @ManyToOne()
     @JoinColumn(name = "roleId", referencedColumnName = "id", nullable = false)
     private Role role;
+    @Column(nullable = true)
+    private String securityQuestion;
+    @Column(nullable = true)
+    private String securityAnswer;
+    @Column
+    private String resetToken;
+
+    public User(Long id, String firstname, String lastname, String email, boolean emailValidated, String password, boolean active, Long birthDate, Address address, Role role) {
+        this.id = id;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.email = email;
+        this.emailValidated = emailValidated;
+        this.password = password;
+        this.active = active;
+        this.birthDate = birthDate;
+        this.address = address;
+        this.role = role;
+    }
 }

@@ -42,6 +42,10 @@ public class UserService {
     public User readUserById(long id) {
         return userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
+    @Transactional(readOnly = true)
+    public User readUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
+    }
 
     @Transactional(readOnly = true)
     public List<User> readAllUsers() {
