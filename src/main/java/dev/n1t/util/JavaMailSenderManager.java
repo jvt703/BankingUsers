@@ -15,7 +15,7 @@ public class JavaMailSenderManager {
         mailSender.setPort(587);
 
         mailSender.setUsername("ninetenbankmail@gmail.com");
-        mailSender.setPassword("");
+        mailSender.setPassword("rbfuyhtvgijarkcv");
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");

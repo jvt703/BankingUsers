@@ -2,6 +2,7 @@ package dev.n1t.controller;
 
 import dev.n1t.dto.PasswordResetDTO;
 import dev.n1t.dto.SecurityPasswordDTO;
+import dev.n1t.dto.SecurityQuestionDTO;
 import dev.n1t.dto.UserDTO;
 
 import dev.n1t.model.Address;
@@ -14,17 +15,9 @@ import dev.n1t.util.TokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -63,6 +56,7 @@ public class UserController {
     // reset password route
 
     @PostMapping("/securityQuestion")
+
     public ResponseEntity<String> securityQuestionCheck(@RequestBody SecurityPasswordDTO securityPasswordDTO){
         User user = userService.readUserByEmail(securityPasswordDTO.getEmail());
         if(!user.getSecurityAnswer().equals(securityPasswordDTO.getSecurityAnswer())){
@@ -76,7 +70,7 @@ public class UserController {
         userService.updateUser(user);
 
         // Generate the password reset link with the token
-        String resetLink = "https://localhost:8081/reset-password?userId=" + user.getId() + "&token=" + resetToken;
+        String resetLink = "http://localhost:3000/reset-password?userId=" + user.getId() + "&token=" + resetToken;
 
         // Send the password reset email with the link
         emailService.sendpassResetEmail(user.getEmail(), resetLink);
@@ -89,6 +83,8 @@ public class UserController {
  public ResponseEntity<String> passwordReset(@RequestBody PasswordResetDTO passwordResetDTO){
         //check token is correct
         User user = userService.readUserById(passwordResetDTO.getId());
+     System.out.println(user.getResetToken().toString()+"thereset");
+     System.out.println(passwordResetDTO.getResetToken().toString()+"theonesent");
         if(!user.getResetToken().equals(passwordResetDTO.getResetToken())){
 
             throw new RuntimeException("Token does not match");
@@ -103,6 +99,14 @@ public class UserController {
 
      return ResponseEntity.ok("Password Reset Successfully");
  }
+    @GetMapping("/securityQuestion/{email}")
+    public ResponseEntity<SecurityQuestionDTO> readUserByEmail(@PathVariable("email") String email) {
+
+        User user = userService.readUserByEmail(email);
+        if (user == null) {return new ResponseEntity<>(HttpStatus.NOT_FOUND);}
+        SecurityQuestionDTO securityQuestionDTO = new SecurityQuestionDTO(user.getEmail(), user.getSecurityQuestion());
+        return ResponseEntity.ok(securityQuestionDTO);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> readUserById(@PathVariable("id") int id) {
@@ -121,18 +125,27 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> readAllUsers(@RequestParam Map<String, String> query) {
+    @PreAuthorize("((#Role.equals('admin'))")
+    public ResponseEntity<List<UserDTO>> readAllUsers(
+            @RequestParam Map<String, String> query,
+            @RequestHeader("Role") String Role) {
         return ResponseEntity.ok(userService.readAllUsersDTO(query));
     }
 
-    @PutMapping
-    public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userDTO) {
+    @PutMapping("/{userId}/update")
+    @PreAuthorize("(#Role.equals('User') and #userId == #requestId) or (#Role.equals('admin'))")
+    public ResponseEntity<UserDTO> updateUser(
+            @RequestBody UserDTO userDTO,
+            @RequestHeader("Role") String Role,
+            @RequestHeader("id") Long requestId
+    ) {
         UserDTO userDTO1 = userService.updateUserDTO(userDTO);
         if (userDTO1 == null) {return new ResponseEntity<>(HttpStatus.BAD_REQUEST);}
         return ResponseEntity.ok(userDTO1);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("((#Role.equals('admin'))")
     public ResponseEntity<UserDTO> deleteUserById(@PathVariable("id") int id) {
         userService.deleteUserById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
