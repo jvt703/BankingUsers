@@ -10,6 +10,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 @Component
 public class EmailServiceImpl {
@@ -47,6 +48,34 @@ public class EmailServiceImpl {
             emailSender.send(message);
         } catch (MessagingException | UnsupportedEncodingException e) {
             System.out.printf("An email could not be sent to %s%n", to);
+        }
+    }
+
+    public void sendBalanceEmail(String email, Map<String, Double> contentMap) {
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            String subject = "Balance Updates";
+
+            // Generate the email body
+            StringBuilder bodyBuilder = new StringBuilder();
+            for (Map.Entry<String, Double> entry : contentMap.entrySet()) {
+                String key = entry.getKey();
+                Double value = entry.getValue();
+                bodyBuilder.append(key).append(": ").append(value).append("\n");
+            }
+
+            String body = bodyBuilder.toString();
+
+            helper.setFrom(new InternetAddress("ninetenemailserver@gmail.com", "NineTen Bank"));
+            helper.setTo(email);
+            helper.setSubject(subject);
+            helper.setText(body, true); // Set HTML content to true
+
+            emailSender.send(message);
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            System.out.printf("An email could not be sent to %s%n", email);
         }
     }
 }

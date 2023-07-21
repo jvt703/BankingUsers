@@ -150,4 +150,11 @@ public class UserController {
         userService.deleteUserById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+    @GetMapping("/sendEmails")
+    public ResponseEntity<String> sendEmails(){
+        System.out.println("we start");
+        userService.getBalanceFromAccount();
+        String message = new String("we sent");
+        return ResponseEntity.ok(message);
+    }
 }
